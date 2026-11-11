@@ -1,8 +1,8 @@
-# instagrapi-node
+# instaleys
 
-Port Node.js dari [instagrapi](https://github.com/subzeroid/instagrapi) dengan dua lapisan:
+Port Node.js dari klien Instagram Private API dengan dua lapisan:
 
-1. `Client`: klien Instagram Private API (setara `instagrapi.Client`).
+1. `Client`: klien Instagram Private API (setara `instaleys.Client`).
 2. `makeIGSocket`: API bergaya Baileys (`sock.ev`, `useMultiFileAuthState`, `makeInMemoryStore`) di atas `Client`.
 
 Butuh Node.js 18.17+. Dependensi: `undici`. Opsional: `sharp` (konversi foto non-JPEG saat kirim gambar).
@@ -12,12 +12,12 @@ npm install
 npm run verify
 ```
 
-Untuk kontributor dan agent AI: baca `AGENTS.md` sebelum mengubah kode.
+Untuk kontributor: baca `AGENTS.md` sebelum mengubah kode.
 
 ## Mulai cepat (gaya Baileys)
 
 ```js
-import { makeIGSocket, makeInMemoryStore, useMultiFileAuthState, getMessageText, DisconnectReason } from 'instagrapi-node'
+import { makeIGSocket, makeInMemoryStore, useInMemoryAuthState, getMessageText, DisconnectReason } from 'instaleys'
 
 const store = makeInMemoryStore({})
 const { state, saveCreds } = await useMultiFileAuthState('auth_info_ig')
@@ -64,7 +64,7 @@ Helper: `userJid`, `groupJid`, `jidDecode`, `jidEncode`, `isJidUser`, `isJidGrou
 
 Instagram tidak punya WebSocket publik seperti WhatsApp. Port ini **polling inbox** tiap `pollIntervalMs` (default 10 detik, dengan jitter), lalu membandingkan dengan state sebelumnya untuk menghasilkan event. Artinya:
 
-- Pesan masuk tertunda sampai satu interval polling. Realtime MQTT belum diport. Opsi `transport` pada `makeIGSocket` mendukung `'poll'` (default) dan akan mendukung `'mqtt'` setelah port dari `instagrapi/realtime` selesai. Nilai lain melempar `NotSupportedError`.
+- Pesan masuk tertunda sampai satu interval polling. Realtime MQTT belum diport. Opsi `transport` pada `makeIGSocket` mendukung `'poll'` (default) dan akan mendukung `'mqtt'` setelah port realtime selesai. Nilai lain melempar `NotSupportedError`.
 - Jangan menurunkan interval terlalu agresif; Instagram membatasi request. Saat terkena throttle, socket otomatis backoff dan mengirim `connection: 'connecting'` lalu `'open'` ketika pulih.
 - State per thread (id pesan yang sudah dilihat) disimpan lewat `auth.keys` (`thread-state`), sehingga setelah restart hanya pesan yang masuk saat offline yang dikirim sebagai `notify`.
 - `chatModify({ archive })` dan `{ delete }` keduanya memakai endpoint `hide` milik Instagram.
@@ -80,7 +80,7 @@ const sock = makeIGSocket({ transport: 'poll' })
 ```
 
 - `'poll'` (default): polling inbox lewat `direct_v2/inbox/`, seperti sebelumnya.
-- `'mqtt'`: menunjuk ke realtime MQTT milik Instagram (klien `RealtimeClient` dan `FbnsClient` dari `instagrapi/realtime`), belum diport ke Node. `makeIGSocket` dengan `transport: 'mqtt'` melempar `NotSupportedError` sampai port hadir.
+- `'mqtt'`: menunjuk ke realtime MQTT milik Instagram (klien `RealtimeClient` dan `FbnsClient` dari `instaleys/realtime`), belum diport ke Node. `makeIGSocket` dengan `transport: 'mqtt'` melempar `NotSupportedError` sampai port hadir.
 
 Helper `resolveRealtimeTransport` diekspor untuk validasi nilai transport. Custom transport masih menunggu port MQTT stabil dari sisi protokol.
 
@@ -120,7 +120,7 @@ Helper `resolveRealtimeTransport` diekspor untuk validasi nilai transport. Custo
 { forward: msg }
 ```
 
-Foto/video/voice ke chat pribadi membutuhkan thread yang sudah ada. `caption` pada gambar dikirim sebagai pesan teks terpisah. Konten yang tidak didukung Instagram (`poll`, `location`, `contacts`, `buttons`, `sticker`, `document`, `edit`) melempar `NotSupportedError`. Aksi grup selain `add` dan `groupLeave` juga belum tersedia karena endpoint-nya tidak ada di instagrapi.
+Foto/video/voice ke chat pribadi membutuhkan thread yang sudah ada. `caption` pada gambar dikirim sebagai pesan teks terpisah. Konten yang tidak didukung Instagram (`poll`, `location`, `contacts`, `buttons`, `sticker`, `document`, `edit`) melempar `NotSupportedError`. Aksi grup selain `add` dan `groupLeave` juga belum tersedia karena endpoint-nya tidak ada di klien asli.
 
 ### Format pesan
 
@@ -149,7 +149,7 @@ Helper: `getContentType`, `normalizeMessageContent`, `getMessageText`, `download
 
 `sock.instagram` menerima username, pk, atau JID: `userInfo`, `followers`, `following`, `medias`, `clips`, `stories`, `follow`, `unfollow`, `block`, `unblock`, `closeFriendAdd/Remove`, `followRequests`, `like`/`unlike`, `comment`, `comments`, `commentReplies`, `likeComment`, `deleteComments`, `mediaInfo` (menerima URL post), `storySeen`, `storyViewers`, `hashtagInfo`, `hashtagMedias`, `hashtagFollow`, `explore`, `timeline`, `reelsTray`, `editAccount`, `setPrivate`, `setPublic`.
 
-Seluruh `Client` (semua method camelCase hasil port instagrapi) juga tersedia di `sock.client`.
+Seluruh `Client` (semua method camelCase hasil port klien asli) juga tersedia di `sock.client`.
 
 ## Belum diport
 
