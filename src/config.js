@@ -17,15 +17,15 @@ export const DEVICE_SETTINGS = {
   cpu: 'husky'
 }
 
-export const DEFAULT_APP_VERSION = '449.0.0.52.84'
+export const DEFAULT_APP_VERSION = '455.0.0.51.72'
 
 export const APP_KEYS = ['app_version', 'version_code', 'bloks_versioning_id']
 
 export const APP_SETTINGS = {
   [DEFAULT_APP_VERSION]: {
     app_version: DEFAULT_APP_VERSION,
-    version_code: '1079242191',
-    bloks_versioning_id: '799db3e387d7a21a19c72918b8698b6cd28a1516ade363792c100ed45a0f9f0b'
+    version_code: '386113915',
+    bloks_versioning_id: '38c9c25c1e1c66a4a2ccc7e22630a4114b951b1961dccf946407c9cd620bbb06'
   },
   '448.0.0.0.20': {
     app_version: '448.0.0.0.20',

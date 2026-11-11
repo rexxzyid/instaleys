@@ -38,7 +38,7 @@ test('settings round trip menjaga uuid dan device', () => {
   assert.equal(a.uuid, b.uuid)
   assert.equal(a.phoneId, b.phoneId)
   assert.equal(a.userAgent, b.userAgent)
-  assert.match(a.userAgent, /^Instagram 449\.0\.0\.52\.84 Android \(34\/14; 480dpi; 1344x2992; Google\/google; Pixel 8 Pro; husky; husky; en_US; 1079242191\)$/)
+  assert.match(a.userAgent, /^Instagram 455\.0\.0\.51\.72 Android \(34\/14; 480dpi; 1344x2992; Google\/google; Pixel 8 Pro; husky; husky; en_US; 386113915\)$/)
 })
 
 test('authorization header dibangun dan di-parse', () => {
