@@ -1,0 +1,25 @@
+{
+  "name": "instagrapi-node",
+  "version": "0.1.0",
+  "description": "Node.js port of instagrapi (Instagram Private API client)",
+  "type": "module",
+  "main": "src/index.js",
+  "exports": {
+    ".": "./src/index.js"
+  },
+  "engines": {
+    "node": ">=18.17"
+  },
+  "scripts": {
+    "test": "node --test",
+    "check": "node scripts/check-clean.js",
+    "verify": "node scripts/check-clean.js && node --test"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "undici": "^6.21.0"
+  },
+  "optionalDependencies": {
+    "sharp": "^0.33.5"
+  }
+}
