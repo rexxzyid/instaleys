@@ -22,6 +22,7 @@ import { highlightMixin } from './mixins/highlight.js'
 import { graphqlMixin } from './mixins/graphql.js'
 import { noteMixin } from './mixins/note.js'
 import { insightsMixin } from './mixins/insights.js'
+import { fbsearchMixin } from './mixins/fbsearch.js'
 
 const silent = () => {}
 
@@ -144,7 +145,8 @@ Object.defineProperties(
       highlightMixin,
       graphqlMixin,
       noteMixin,
-      insightsMixin
+      insightsMixin,
+      fbsearchMixin
     ].map((mixin) => Object.getOwnPropertyDescriptors(mixin))
   )
 )

@@ -419,6 +419,13 @@ export const buildSocketApi = (rt) => {
     insightsAccount: async () => client.insightsAccount(),
     insightsMedia: async (mediaId) => client.insightsMedia(mediaId),
     insightsMediaFeedAll: async (options = {}) => client.insightsMediaFeedAll(options),
+    searchHashtags: async (query) => client.searchHashtags(query),
+    searchMusic: async (query) => client.searchMusic(query),
+    searchPlaces: async (query, lat, lng) => client.fbsearchPlaces(query, lat, lng),
+    searchMedias: async (query, amount = 27) => client.mediaSearch(query, amount),
+    searchTop: async (query) => client.fbsearchTopsearchFlat(query),
+    searchRecent: async () => client.fbsearchRecent(),
+    suggestedProfiles: async (who) => client.fbsearchSuggestedProfiles(await resolvePk(who)),
     collections: async () => client.collections(),
     collectionPkByName: async (name) => client.collectionPkByName(name),
     collectionMedias: async (collectionPk, amount = 21, lastMediaPk = 0) =>

@@ -151,6 +151,25 @@ export const extractHashtagV1 = (input) => ({
   profile_pic_url: input.profile_pic_url || null
 })
 
+const HTML_ENTITIES = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" }
+
+const unescapeHtml = (value) =>
+  value.replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (match, entity) => {
+    if (entity[0] !== '#') return HTML_ENTITIES[entity.toLowerCase()] ?? match
+    const hex = entity[1].toLowerCase() === 'x'
+    return String.fromCodePoint(parseInt(entity.slice(hex ? 2 : 1), hex ? 16 : 10))
+  })
+
+export const extractTrack = (input) => {
+  const data = clone(input)
+  data.cover_artwork_uri = data.cover_artwork_uri || null
+  data.cover_artwork_thumbnail_uri = data.cover_artwork_thumbnail_uri || null
+  const match = /<BaseURL>(.+?)<\/BaseURL>/.exec(data.dash_manifest ?? '')
+  data.uri = match ? unescapeHtml(match[1]) : null
+  data.territory_validity_periods = data.territory_validity_periods || {}
+  return data
+}
+
 export const extractCollection = (input) => {
   const data = {}
   for (const [key, value] of Object.entries(input)) data[key.replace(/^collection_/, '')] = value

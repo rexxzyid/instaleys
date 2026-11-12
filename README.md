@@ -115,6 +115,20 @@ await sock.instagram.updateNotesLastSeen()
 
 `sock.instagram.notes()` memakai private GraphQL (`graphql/query`). `track` berasal dari `client.notesMusicBrowser()` atau objek lain dengan `audio_cluster_id`.
 
+## Pencarian
+
+```js
+await sock.instagram.searchHashtags('travel')
+await sock.instagram.searchMusic('judul lagu')
+await sock.instagram.searchPlaces('kopi', -6.2, 106.8)
+await sock.instagram.searchMedias('kuliner', 27)
+await sock.instagram.searchTop('query')
+await sock.instagram.searchRecent()
+await sock.instagram.suggestedProfiles('username')
+```
+
+Method lain di `sock.client`: `fbsearchAccountsV2`, `fbsearchReelsV2`, `fbsearchTopsearchV2`, `fbsearchItem`, `fbsearchKeywordTypeahead`, `fbsearchTypeaheadStream`, `fbsearchTypehead`, `webSearchTopsearch`, `webSearchTopsearchHashtags`.
+
 ## Insights (akun bisnis/kreator)
 
 ```js
