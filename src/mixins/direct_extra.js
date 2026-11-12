@@ -441,6 +441,33 @@ export const directExtraMixin = {
     return extractDirectMessage(result.payload)
   },
 
+  async directSendCutoutSticker(stickerPk, { userIds = [], threadIds = [] } = {}) {
+    requireLogin(this)
+    const users = idList(userIds)
+    const threads = idList(threadIds)
+    requireTarget(users, threads)
+    const token = this.generateMutationToken()
+    const jsonParams = dumps({ sticker_id: `cutout_photo_${stickerPk}`, embedded_ent_type: 101 })
+    const data = {
+      action: 'send_item',
+      embedded_ent_type: '101',
+      json_params: jsonParams,
+      client_context: token,
+      mutation_token: token,
+      device_id: this.androidDeviceId,
+      _uuid: this.uuid,
+      offline_threading_id: token
+    }
+    if (users.length) data.recipient_users = `[${bigintList(users)}]`
+    if (threads.length) data.thread_ids = bigintList(threads)
+    const result = await this.privateRequest(
+      'direct_v2/threads/broadcast/generic_share/',
+      this.withDefaultData(data),
+      { withSignature: false }
+    )
+    return extractDirectMessage(result.payload)
+  },
+
   messengerRuploadHeaders(extra = null) {
     const base = this.baseHeaders
     const userId = String(this.userId)

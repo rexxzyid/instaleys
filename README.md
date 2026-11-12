@@ -103,6 +103,17 @@ Method lain: `following`, `clips`, `stories`, `follow`, `unfollow`, `block`, `un
 
 Semua method `Client` juga tersedia di `sock.client`.
 
+## DM langsung via Client
+
+```js
+await sock.client.directSend(userId, 'halo')
+await sock.client.directSendPhoto(buffer, { userIds: [userId] })
+await sock.client.directSendCutoutSticker('123456789', { userIds: [userId] })
+await sock.client.directMediaShare(mediaId, { userIds: [userId] })
+```
+
+Method DM lain: `directSendFile`, `directSendVideo`, `directSendVoice`, `directThreadMute`, `directThreadCreate`, `directThreadAddUsers`, dan lainnya.
+
 ## 2FA TOTP
 
 ```js
