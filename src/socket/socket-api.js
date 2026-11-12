@@ -435,6 +435,9 @@ export const buildSocketApi = (rt) => {
     musicTrending: async (product = 'feed_post') => client.musicTrending(product),
     trackInfo: async (musicCanonicalId) => client.trackInfoByCanonicalId(musicCanonicalId),
     trackById: async (trackId, maxId = '') => client.trackInfoById(trackId, maxId),
+    fundraiserInfo: async (who) => client.standaloneFundraiserInfoV1(await resolvePk(who)),
+    quicksnapHistory: async (amount = 20, endCursor = null) => client.quicksnapHistory(amount, endCursor),
+    quicksnapDelete: async (mediaId) => client.quicksnapDelete(mediaId),
     collections: async () => client.collections(),
     collectionPkByName: async (name) => client.collectionPkByName(name),
     collectionMedias: async (collectionPk, amount = 21, lastMediaPk = 0) =>

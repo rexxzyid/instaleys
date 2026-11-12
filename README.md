@@ -158,6 +158,17 @@ await sock.client.musicVerifyOriginalAudioTitle('Judul audio')
 
 Method lain di `sock.client`: `musicInFeedAudioBrowser`, `musicTopTrends`, `musicBookmarked`, `musicClipsAudioBrowser`, `trackStreamInfoById`. Track yang tidak ditemukan melempar `TrackNotFound`.
 
+## QuickSnap dan fundraiser
+
+```js
+const history = await sock.instagram.quicksnapHistory(20)
+await sock.instagram.quicksnapHistory(20, history.page_info.end_cursor)
+await sock.instagram.quicksnapDelete(mediaId)
+await sock.instagram.fundraiserInfo('username')
+```
+
+`quicksnapSend` belum diport karena butuh upload foto feed (`photo_rupload`).
+
 ## Insights (akun bisnis/kreator)
 
 ```js
