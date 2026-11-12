@@ -1,6 +1,6 @@
 {
-  "name": "instagrapi-node",
-  "version": "0.1.0",
+  "name": "@rexxhayanasi/instaleys",
+  "version": "1.0.0",
   "description": "Node.js port of instagrapi (Instagram Private API client)",
   "type": "module",
   "main": "src/index.js",
