@@ -9,7 +9,7 @@ Port Node.js (ESM, Node >= 20) dari library Python `instagrapi` (Instagram Priva
 1. `Client` (`src/client.js`, `src/mixins/*`): port langsung instagrapi.
 2. `makeIGSocket` (`src/socket/*`): API bergaya Baileys di atas `Client`. Mendeteksi pesan baru lewat polling inbox, bukan realtime.
 
-Sumber kebenaran tunggal untuk endpoint, parameter, header, dan perilaku adalah kode Python asli (`instagrapi-master/instagrapi/`). Dokumentasi, ingatan, dan library lain BUKAN sumber kebenaran.
+Sumber kebenaran tunggal untuk endpoint, parameter, header, dan perilaku adalah kode Python asli (`instagrapi-master/instagrapi/`) dan aplikasi dumv terbaru di (`/storage/emulated/0/Instagram/`). Dokumentasi, ingatan, dan library lain BUKAN sumber kebenaran.
 
 ## 2. Aturan mutlak
 
