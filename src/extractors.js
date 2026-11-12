@@ -151,6 +151,31 @@ export const extractHashtagV1 = (input) => ({
   profile_pic_url: input.profile_pic_url || null
 })
 
+export const extractCollection = (input) => {
+  const data = {}
+  for (const [key, value] of Object.entries(input)) data[key.replace(/^collection_/, '')] = value
+  return {
+    id: String(data.id),
+    name: data.name,
+    type: data.type,
+    media_count: data.media_count
+  }
+}
+
+export const extractHighlightV1 = (input) => {
+  const data = clone(input)
+  data.pk = String(data.id).split(':')[1]
+  if (data.user && typeof data.user === 'object') data.user = extractUserShort(data.user)
+  data.items = (data.items ?? []).map(extractStoryV1)
+  return data
+}
+
+export const extractGuideV1 = (input) => {
+  const data = clone(input.summary ?? {})
+  data.cover_media = extractMediaV1(data.cover_media)
+  return data
+}
+
 export const extractDirectMedia = (input) => {
   const media = clone(input)
   if (media.video_versions?.length) media.video_url = bestByArea(media.video_versions).url

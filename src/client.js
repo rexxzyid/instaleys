@@ -14,6 +14,11 @@ import { storyMixin } from './mixins/story.js'
 import { hashtagMixin } from './mixins/hashtag.js'
 import { exploreMixin } from './mixins/explore.js'
 import { totpMixin } from './mixins/totp.js'
+import { shareMixin } from './mixins/share.js'
+import { collectionMixin } from './mixins/collection.js'
+import { timelineMixin } from './mixins/timeline.js'
+import { locationMixin } from './mixins/location.js'
+import { highlightMixin } from './mixins/highlight.js'
 
 const silent = () => {}
 
@@ -128,7 +133,12 @@ Object.defineProperties(
       storyMixin,
       hashtagMixin,
       exploreMixin,
-      totpMixin
+      totpMixin,
+      shareMixin,
+      collectionMixin,
+      timelineMixin,
+      locationMixin,
+      highlightMixin
     ].map((mixin) => Object.getOwnPropertyDescriptors(mixin))
   )
 )

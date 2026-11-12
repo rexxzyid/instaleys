@@ -101,6 +101,42 @@ await sock.instagram.hashtagMedias('travel')
 
 Method lain: `following`, `clips`, `stories`, `follow`, `unfollow`, `block`, `unblock`, `closeFriendAdd/Remove`, `followRequests`, `unlike`, `comments`, `commentReplies`, `likeComment`, `deleteComments`, `mediaInfo`, `storyViewers`, `hashtagInfo`, `hashtagFollow`, `explore`, `timeline`, `reelsTray`, `editAccount`, `setPrivate`, `setPublic`.
 
+## Koleksi, reels, lokasi, highlight
+
+```js
+await sock.instagram.collections()
+await sock.instagram.collectionMedias(collectionPk)
+await sock.instagram.saveMedia(mediaId)
+await sock.instagram.likedMedias()
+
+await sock.instagram.reels(10)
+await sock.instagram.exploreReels(10)
+await sock.instagram.friendsReels(10)
+
+await sock.instagram.locationSearch(-6.2, 106.8)
+await sock.instagram.locationMedias(locationPk, 63, 'ranked')
+await sock.instagram.locationMediasTop(locationPk)
+await sock.instagram.locationMediasRecent(locationPk)
+await sock.instagram.locationGuides(locationPk)
+
+await sock.instagram.userHighlights('username')
+await sock.instagram.highlightInfo(highlightPk)
+await sock.instagram.highlightCreate('Judul', [storyId])
+await sock.instagram.highlightAddStories(highlightPk, [storyId])
+await sock.instagram.highlightRemoveStories(highlightPk, [storyId])
+await sock.instagram.highlightDelete(highlightPk)
+```
+
+`locationSearchName`, `locationSearchPk`, `locationComplete`, `locationBuild`, dan `shareInfo` sisi publik belum diport karena butuh public web API. `locationMediasTop`/`Recent` memakai tab `ranked`/`recent`.
+
+## Share code
+
+```js
+const info = sock.client.shareInfo('aGlnaGxpsdsdZ2h0OjE3OTg4MDg5NjI5MzgzNzcw')
+sock.client.shareCodeFromUrl('https://www.instagram.com/p/ABC123/')
+await sock.instagram.shareInfoByUrl('https://www.instagram.com/p/ABC123/')
+```
+
 Semua method `Client` juga tersedia di `sock.client`.
 
 ## DM langsung via Client
@@ -129,5 +165,7 @@ Bisa dipanggil lewat `sock.client` atau instance `Client` langsung.
 ## Batasan
 
 - Pesan baru dideteksi lewat polling (default 10 detik), bukan realtime. `transport: 'mqtt'` melempar `NotSupportedError`.
-- Belum tersedia: login Bloks CAA, challenge resolver otomatis, upload post/reel/story, download media, public/GraphQL, signup, insights, location, dan modul lain di luar yang disebut di atas.
+- Belum tersedia: login Bloks CAA, challenge resolver otomatis, upload post/reel/story, download media, public/GraphQL, signup, insights, notes, track, dan modul lain di luar yang disebut di atas.
+- `locationSearchName`, `locationSearchPk`, `locationComplete`, dan `locationBuild` tidak diport karena bergantung pada public web API.
+- `highlightChangeCover` tidak diport karena butuh upload foto (`photo_rupload`).
 - Semua pengujian memakai server palsu; belum pernah diuji ke Instagram sungguhan.

@@ -252,7 +252,8 @@ export const privateMixin = {
         method = 'POST'
         requestHeaders['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8'
         if (typeof data === 'string') {
-          body = data
+          body = withSignature ? generateSignature(dumps(data)) : data
+          if (withSignature && extraSig) body += extraSig.join('&')
         } else if (withSignature) {
           body = generateSignature(dumps(data))
           if (extraSig) body += extraSig.join('&')
