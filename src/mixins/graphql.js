@@ -98,6 +98,18 @@ const graphqlHttpError = (response, lastJson) => {
   return new ErrorClass(label, props)
 }
 
+const mergeHeaders = (base, overrides) => {
+  const merged = { ...base }
+  for (const [key, value] of Object.entries(overrides ?? {})) {
+    const lower = key.toLowerCase()
+    for (const existing of Object.keys(merged)) {
+      if (existing.toLowerCase() === lower) delete merged[existing]
+    }
+    merged[key] = value
+  }
+  return merged
+}
+
 const graphqlFormData = (friendlyName, variables) => ({
   method: 'post',
   pretty: 'false',
@@ -129,15 +141,14 @@ export const graphqlMixin = {
     const data = graphqlFormData(friendlyName, variables)
     if (purpose !== null) data.purpose = purpose
     if (clientDocId) data.client_doc_id = String(clientDocId)
-    const headers = {
-      ...this.baseHeaders,
+    const ownHeaders = {
       'X-FB-Friendly-Name': friendlyName,
       'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
     }
-    if (clientDocId) headers['X-Client-Doc-Id'] = String(clientDocId)
-    Object.assign(headers, extraHeaders ?? {})
-    headers.Host = domain
-    if (this.authorization && !('Authorization' in headers)) headers.Authorization = this.authorization
+    if (clientDocId) ownHeaders['X-Client-Doc-Id'] = String(clientDocId)
+    const headers = mergeHeaders(this.baseHeaders, { ...ownHeaders, ...(extraHeaders ?? {}), Host: domain })
+    const hasAuthorization = Object.keys(headers).some((key) => key.toLowerCase() === 'authorization')
+    if (this.authorization && !hasAuthorization) headers.Authorization = this.authorization
     if (this.requestTimeout) await new Promise((resolve) => setTimeout(resolve, this.requestTimeout * 1000))
     const url = `https://${domain}/graphql_www`
     this.logger.info(url)
@@ -166,10 +177,14 @@ export const graphqlMixin = {
   async privateGraphqlRequest(data, { headers = null, domain = null } = {}) {
     this.lastResponse = null
     this.lastJson = {}
-    const requestHeaders = { ...this.baseHeaders, ...(headers ?? {}) }
-    requestHeaders['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8'
-    if (data.fb_api_req_friendly_name) requestHeaders['X-FB-Friendly-Name'] = data.fb_api_req_friendly_name
+    let requestHeaders = mergeHeaders(this.baseHeaders, {
+      'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+    })
     if (this.authorization) requestHeaders.Authorization = this.authorization
+    if (data.fb_api_req_friendly_name) {
+      requestHeaders = mergeHeaders(requestHeaders, { 'X-FB-Friendly-Name': data.fb_api_req_friendly_name })
+    }
+    requestHeaders = mergeHeaders(requestHeaders, headers)
     if (this.requestTimeout) await new Promise((resolve) => setTimeout(resolve, this.requestTimeout * 1000))
     const url = `https://${domain ?? API_DOMAIN}/graphql/query`
     this.logger.info(url)
@@ -223,5 +238,44 @@ export const graphqlMixin = {
     if (clientDocId) headers['X-Client-Doc-Id'] = String(clientDocId)
     if (priority) headers.Priority = priority
     return this.privateGraphqlRequest(data, { headers: { ...headers, ...(extraHeaders ?? {}) } })
+  },
+
+  async privateGraphqlMemoriesPog(clientDocId = '4160563056814166588457451196', directRegionHint = null) {
+    const extraHeaders = directRegionHint ? { 'ig-u-ig-direct-region-hint': directRegionHint } : null
+    return this.privateGraphqlQueryRequest({
+      friendlyName: 'MemoriesPogQuery',
+      rootFieldName: 'xdt_get_story_memories_pog',
+      variables: { request: { user_id: 0 } },
+      clientDocId,
+      extraHeaders
+    })
+  },
+
+  async privateGraphqlRealtimeRegionHint(clientDocId = '52232106018313849661757113193') {
+    return this.privateGraphqlQueryRequest({
+      friendlyName: 'IGRealtimeRegionHintQuery',
+      rootFieldName: 'xdt_igd_msg_region',
+      variables: {},
+      clientDocId,
+      priority: 'u=3, i'
+    })
+  },
+
+  async privateGraphqlTopAudioTrendsEligibleCategories(clientDocId = '10243243298540497152200027985') {
+    return this.privateGraphqlQueryRequest({
+      friendlyName: 'GetTopAudioTrendsEligibleCategories',
+      rootFieldName: 'xdt_top_audio_trends_eligible_tabs',
+      variables: {},
+      clientDocId
+    })
+  },
+
+  async privateGraphqlUpdateInboxTrayLastSeen(clientDocId = '41048505499858972910914091441') {
+    return this.privateGraphqlQueryRequest({
+      friendlyName: 'UpdateInboxTrayLastSeenTimestamp',
+      rootFieldName: '__typename',
+      variables: {},
+      clientDocId
+    })
   }
 }

@@ -169,6 +169,8 @@ await sock.instagram.fundraiserInfo('username')
 
 `quicksnapSend` belum diport karena butuh upload foto feed (`photo_rupload`).
 
+Helper GraphQL di `sock.client`: `privateGraphqlWwwRequest`, `privateGraphqlMemoriesPog`, `privateGraphqlRealtimeRegionHint`, `privateGraphqlTopAudioTrendsEligibleCategories`, `privateGraphqlUpdateInboxTrayLastSeen`.
+
 ## Insights (akun bisnis/kreator)
 
 ```js

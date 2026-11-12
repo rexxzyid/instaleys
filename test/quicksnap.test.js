@@ -163,3 +163,33 @@ test('quicksnap butuh login', async () => {
   await assert.rejects(client.quicksnapHistory(), ValidationError)
   await assert.rejects(client.quicksnapDelete('1'), ValidationError)
 })
+
+test('helper private graphql query mengirim friendly name, root field, dan doc id dari sumber', async () => {
+  const seen = []
+  await withServer(recordingServer(seen, json({ data: {} })), async (port) => {
+    const client = loggedInClient(port)
+    await client.privateGraphqlMemoriesPog(undefined, 'region-1')
+    await client.privateGraphqlRealtimeRegionHint()
+    await client.privateGraphqlTopAudioTrendsEligibleCategories()
+    await client.privateGraphqlUpdateInboxTrayLastSeen()
+    const expected = [
+      ['MemoriesPogQuery', 'xdt_get_story_memories_pog', '4160563056814166588457451196', '{"request":{"user_id":0}}'],
+      ['IGRealtimeRegionHintQuery', 'xdt_igd_msg_region', '52232106018313849661757113193', '{}'],
+      ['GetTopAudioTrendsEligibleCategories', 'xdt_top_audio_trends_eligible_tabs', '10243243298540497152200027985', '{}'],
+      ['UpdateInboxTrayLastSeenTimestamp', '__typename', '41048505499858972910914091441', '{}']
+    ]
+    expected.forEach(([friendlyName, rootField, docId, variables], index) => {
+      const request = seen[index]
+      const body = formBody(request.body)
+      assert.equal(request.url.pathname, '/graphql/query')
+      assert.equal(body.fb_api_req_friendly_name, friendlyName)
+      assert.equal(body.client_doc_id, docId)
+      assert.equal(body.variables, variables)
+      assert.equal(request.headers['x-root-field-name'], rootField)
+      assert.equal(request.headers['x-client-doc-id'], docId)
+    })
+    assert.equal(seen[0].headers['ig-u-ig-direct-region-hint'], 'region-1')
+    assert.equal(seen[1].headers.priority, 'u=3, i')
+    assert.equal(seen[2].headers.priority, 'u=3')
+  })
+})
