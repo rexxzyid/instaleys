@@ -416,6 +416,9 @@ export const buildSocketApi = (rt) => {
     createMusicNote: async (track, text = '', options = {}) => client.createMusicNote(track, text, options),
     deleteNote: async (noteId) => client.deleteNote(noteId),
     updateNotesLastSeen: async () => client.lastSeenUpdateNote(),
+    insightsAccount: async () => client.insightsAccount(),
+    insightsMedia: async (mediaId) => client.insightsMedia(mediaId),
+    insightsMediaFeedAll: async (options = {}) => client.insightsMediaFeedAll(options),
     collections: async () => client.collections(),
     collectionPkByName: async (name) => client.collectionPkByName(name),
     collectionMedias: async (collectionPk, amount = 21, lastMediaPk = 0) =>

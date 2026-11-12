@@ -21,6 +21,7 @@ import { locationMixin } from './mixins/location.js'
 import { highlightMixin } from './mixins/highlight.js'
 import { graphqlMixin } from './mixins/graphql.js'
 import { noteMixin } from './mixins/note.js'
+import { insightsMixin } from './mixins/insights.js'
 
 const silent = () => {}
 
@@ -142,7 +143,8 @@ Object.defineProperties(
       locationMixin,
       highlightMixin,
       graphqlMixin,
-      noteMixin
+      noteMixin,
+      insightsMixin
     ].map((mixin) => Object.getOwnPropertyDescriptors(mixin))
   )
 )
