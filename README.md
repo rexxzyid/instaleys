@@ -1,23 +1,15 @@
 # instaleys
 
-Port Node.js dari klien Instagram Private API dengan dua lapisan:
-
-1. `Client`: klien Instagram Private API (setara `instaleys.Client`).
-2. `makeIGSocket`: API bergaya Baileys (`sock.ev`, `useMultiFileAuthState`, `makeInMemoryStore`) di atas `Client`.
-
-Butuh Node.js 18.17+. Dependensi: `undici`. Opsional: `sharp` (konversi foto non-JPEG saat kirim gambar).
+Klien Instagram Private API untuk Node.js 18.17+, dengan API bergaya Baileys.
 
 ```bash
-npm install
-npm run verify
+npm install instaleys
 ```
 
-Untuk kontributor: baca `AGENTS.md` sebelum mengubah kode.
-
-## Mulai cepat (gaya Baileys)
+## Mulai cepat
 
 ```js
-import { makeIGSocket, makeInMemoryStore, useInMemoryAuthState, getMessageText, DisconnectReason } from 'instaleys'
+import { makeIGSocket, makeInMemoryStore, useMultiFileAuthState } from 'instaleys'
 
 const store = makeInMemoryStore({})
 const { state, saveCreds } = await useMultiFileAuthState('auth_info_ig')
@@ -25,146 +17,106 @@ const { state, saveCreds } = await useMultiFileAuthState('auth_info_ig')
 const sock = makeIGSocket({
   auth: state,
   credentials: { username: 'user', password: 'pass' },
-  twoFactorCode: () => process.env.IG_2FA,
-  proxy: 'http://user:pass@host:port'
+  twoFactorCode: () => process.env.IG_2FA
 })
 
 store.bind(sock.ev)
 sock.ev.on('creds.update', saveCreds)
 
-sock.ev.on('connection.update', ({ connection, lastDisconnect }) => {
-  if (connection === 'open') console.log('Terhubung', sock.user.username)
-  if (connection === 'close') {
-    const code = lastDisconnect.error?.output?.statusCode
-    if (code !== DisconnectReason.loggedOut) console.log('Buat ulang socket')
-  }
+sock.ev.on('connection.update', ({ connection }) => {
+  if (connection === 'open') console.log('Terhubung sebagai', sock.user.username)
 })
 
 sock.ev.on('messages.upsert', async ({ messages, type }) => {
   if (type !== 'notify') return
-  for (const msg of messages) {
-    if (msg.key.fromMe) continue
-    await sock.sendMessage(msg.key.remoteJid, { text: `Kamu: ${getMessageText(msg.message)}` }, { quoted: msg })
+  for (const message of messages) {
+    if (message.key.fromMe) continue
+    await sock.sendMessage(message.key.remoteJid, { text: 'Halo' }, { quoted: message })
   }
 })
 ```
 
-Login bisa lewat `credentials: { username, password }`, `credentials: { sessionId }`, atau session yang sudah tersimpan di `auth`. Contoh lengkap ada di folder `examples/`.
+Login bisa lewat `credentials: { username, password }`, `credentials: { sessionId }`, atau session yang sudah tersimpan di `auth`.
 
-## JID
-
-| Jenis | Format |
-|---|---|
-| Pengguna / chat pribadi | `<pk>@s.instagram.net` |
-| Grup | `<thread_id>@g.instagram.net` |
-
-Helper: `userJid`, `groupJid`, `jidDecode`, `jidEncode`, `isJidUser`, `isJidGroup`, `jidNormalizedUser`. `sock.resolveJid('username')` mengubah username jadi JID.
-
-## Cara kerja dan batasan penting
-
-Instagram tidak punya WebSocket publik seperti WhatsApp. Port ini **polling inbox** tiap `pollIntervalMs` (default 10 detik, dengan jitter), lalu membandingkan dengan state sebelumnya untuk menghasilkan event. Artinya:
-
-- Pesan masuk tertunda sampai satu interval polling. Realtime MQTT belum diport. Opsi `transport` pada `makeIGSocket` mendukung `'poll'` (default) dan akan mendukung `'mqtt'` setelah port realtime selesai. Nilai lain melempar `NotSupportedError`.
-- Jangan menurunkan interval terlalu agresif; Instagram membatasi request. Saat terkena throttle, socket otomatis backoff dan mengirim `connection: 'connecting'` lalu `'open'` ketika pulih.
-- State per thread (id pesan yang sudah dilihat) disimpan lewat `auth.keys` (`thread-state`), sehingga setelah restart hanya pesan yang masuk saat offline yang dikirim sebagai `notify`.
-- `chatModify({ archive })` dan `{ delete }` keduanya memakai endpoint `hide` milik Instagram.
-- Status `READ` dihitung dari `last_seen_at` thread (di grup: dibaca oleh minimal satu orang).
-- `sendPresenceUpdate` adalah no-op (tidak ada endpoint indikator mengetik).
-
-## Realtime transport
-
-`makeIGSocket` membaca opsi `transport` dari konfigurasi socket:
+## Kirim pesan
 
 ```js
-const sock = makeIGSocket({ transport: 'poll' })
+await sock.sendMessage(jid, { text: 'halo' })
+await sock.sendMessage(jid, { image: { url: 'foto.jpg' }, caption: 'halo' })
+await sock.sendMessage(jid, { video: buffer })
+await sock.sendMessage(jid, { audio: buffer })
+await sock.sendMessage(jid, { react: { text: '🔥', key: message.key } })
+await sock.sendMessage(jid, { delete: message.key })
+await sock.sendMessage(jid, { mediaShare: { mediaId, type: 'photo' } })
+await sock.sendMessage(jid, { storyShare: { storyId } })
+await sock.sendMessage(jid, { profile: { userId } })
+await sock.sendMessage(jid, { forward: message })
 ```
 
-- `'poll'` (default): polling inbox lewat `direct_v2/inbox/`, seperti sebelumnya.
-- `'mqtt'`: menunjuk ke realtime MQTT milik Instagram (klien `RealtimeClient` dan `FbnsClient` dari `instaleys/realtime`), belum diport ke Node. `makeIGSocket` dengan `transport: 'mqtt'` melempar `NotSupportedError` sampai port hadir.
-
-Helper `resolveRealtimeTransport` diekspor untuk validasi nilai transport. Custom transport masih menunggu port MQTT stabil dari sisi protokol.
+JID pengguna: `<pk>@s.instagram.net`. JID grup: `<thread_id>@g.instagram.net`.
 
 ## Event
 
-`connection.update`, `creds.update`, `messaging-history.set`, `messages.upsert` (`notify` / `append`), `messages.update`, `messages.delete`, `messages.reaction`, `message-receipt.update`, `chats.upsert`, `chats.update`, `chats.delete`, `contacts.upsert`, `contacts.update`, `groups.upsert`, `groups.update`, `group-participants.update`, `presence.update`.
-
-`sock.ev` mendukung `on`, `once`, `off`, `removeAllListeners`, `process(handler)` (batch semua event dalam satu tick), `buffer()`/`flush()`, `createBufferedFunction`.
+`connection.update`, `creds.update`, `messaging-history.set`, `messages.upsert`, `messages.update`, `messages.delete`, `messages.reaction`, `message-receipt.update`, `chats.upsert`, `chats.update`, `chats.delete`, `contacts.upsert`, `contacts.update`, `groups.upsert`, `groups.update`, `group-participants.update`, `presence.update`.
 
 ## Method socket
 
 | Kelompok | Method |
 |---|---|
-| Kirim | `sendMessage(jid, content, { quoted })` |
-| Baca / chat | `readMessages(keys)`, `chatModify({ mute \| markRead \| archive \| delete \| spam \| approve }, jid)`, `fetchMessageHistory(jid, count)` |
-| Presence | `presenceSubscribe(jid)`, `fetchActivePresence()` |
-| Kontak | `onInstagram(...usernames)` (alias `onWhatsApp`), `fetchStatus`, `profilePictureUrl`, `getBusinessProfile`, `updateBlockStatus`, `searchUsers` |
-| Grup | `groupMetadata`, `groupFetchAllParticipating`, `groupCreate`, `groupUpdateSubject`, `groupParticipantsUpdate(jid, ids, 'add')` |
+| Kirim | `sendMessage` |
+| Baca / chat | `readMessages`, `chatModify`, `fetchMessageHistory` |
+| Kontak | `onInstagram`, `fetchStatus`, `profilePictureUrl`, `updateBlockStatus`, `searchUsers` |
+| Grup | `groupMetadata`, `groupFetchAllParticipating`, `groupCreate`, `groupUpdateSubject`, `groupParticipantsUpdate` |
 | Request pesan | `fetchMessageRequests`, `acceptMessageRequest`, `fetchSpamInbox` |
 | Akun | `updateProfileStatus`, `updateProfileName`, `refreshSession`, `logout`, `end` |
-| Util | `waitForConnectionUpdate(check, timeout)`, `resolveJid` |
+| Util | `resolveJid`, `waitForConnectionUpdate` |
 
-### `sendMessage` content
-
-```js
-{ text: 'halo' }
-{ text: 'balas', }, { quoted: msg }
-{ react: { text: '🔥', key: msg.key } }
-{ react: { text: '', key: msg.key, previous: '🔥' } }
-{ delete: msg.key }
-{ image: { url } }      // Buffer, path, URL, atau { url | path | stream }
-{ video: buffer }       // MP4
-{ audio: buffer }       // dikirim sebagai voice note
-{ mediaShare: { mediaId, type: 'photo' | 'video' } }
-{ storyShare: { storyId } }
-{ profile: { userId } }
-{ forward: msg }
-```
-
-Foto/video/voice ke chat pribadi membutuhkan thread yang sudah ada. `caption` pada gambar dikirim sebagai pesan teks terpisah. Konten yang tidak didukung Instagram (`poll`, `location`, `contacts`, `buttons`, `sticker`, `document`, `edit`) melempar `NotSupportedError`. Aksi grup selain `add` dan `groupLeave` juga belum tersedia karena endpoint-nya tidak ada di klien asli.
-
-### Format pesan
+## Store dan auth state
 
 ```js
-{
-  key: { remoteJid, fromMe, id, participant, threadId },
-  message: { conversation } | { extendedTextMessage } | { imageMessage } | { videoMessage } |
-           { audioMessage } | { stickerMessage } | { mediaShareMessage } | { reelShareMessage } |
-           { storyShareMessage } | { profileMessage } | { locationMessage } | { reactionMessage } | ...,
-  messageTimestamp, pushName, status, reactions
-}
+const store = makeInMemoryStore({ maxMessagesPerChat: 50 })
+store.bind(sock.ev)
+
+store.chats.all()
+store.messages[jid].array
+await store.loadMessages(jid, 20)
+await store.writeToFile('store.json')
 ```
 
-Helper: `getContentType`, `normalizeMessageContent`, `getMessageText`, `downloadMediaMessage(msg, 'buffer' | 'stream')`.
+`useMultiFileAuthState(folder)` mengembalikan `{ state, saveCreds }`. Jaga folder `auth_info_ig` seperti password. Untuk tes, pakai `useInMemoryAuthState()`.
 
-## Auth state
+## Fitur Instagram lain
 
-- `useMultiFileAuthState(folder)` mengembalikan `{ state, saveCreds }`. `creds.json` berisi session (cookie, token, device, UUID) dan file `thread-state-<id>.json` menyimpan posisi sinkronisasi. File ditulis dengan izin `0600` dan secara atomik. Jaga folder ini seperti password.
-- `useInMemoryAuthState()` untuk tes.
+`sock.instagram` menerima username, pk, atau JID:
 
-## Store
+```js
+await sock.instagram.userInfo('username')
+await sock.instagram.followers('username')
+await sock.instagram.medias('username')
+await sock.instagram.like(mediaId)
+await sock.instagram.comment(mediaId, 'keren')
+await sock.instagram.storySeen(storyId)
+await sock.instagram.hashtagMedias('travel')
+```
 
-`makeInMemoryStore({ maxMessagesPerChat })` dengan `bind(ev)`, `chats` (`all`, `get`, ...), `contacts`, `messages[jid]` (`array`, `get`, ...), `groupMetadata`, `presences`, `state`, `loadMessages(jid, count, { before: key })`, `loadMessage`, `mostRecentMessage`, `fetchImageUrl`, `fetchGroupMetadata`, `toJSON`/`fromJSON`, `writeToFile`/`readFromFile`.
+Method lain: `following`, `clips`, `stories`, `follow`, `unfollow`, `block`, `unblock`, `closeFriendAdd/Remove`, `followRequests`, `unlike`, `comments`, `commentReplies`, `likeComment`, `deleteComments`, `mediaInfo`, `storyViewers`, `hashtagInfo`, `hashtagFollow`, `explore`, `timeline`, `reelsTray`, `editAccount`, `setPrivate`, `setPublic`.
 
-## Fitur Instagram di luar chat
-
-`sock.instagram` menerima username, pk, atau JID: `userInfo`, `followers`, `following`, `medias`, `clips`, `stories`, `follow`, `unfollow`, `block`, `unblock`, `closeFriendAdd/Remove`, `followRequests`, `like`/`unlike`, `comment`, `comments`, `commentReplies`, `likeComment`, `deleteComments`, `mediaInfo` (menerima URL post), `storySeen`, `storyViewers`, `hashtagInfo`, `hashtagMedias`, `hashtagFollow`, `explore`, `timeline`, `reelsTray`, `editAccount`, `setPrivate`, `setPublic`.
-
-Seluruh `Client` (semua method camelCase hasil port klien asli) juga tersedia di `sock.client`.
+Semua method `Client` juga tersedia di `sock.client`.
 
 ## 2FA TOTP
 
-Port dari `instagrapi/mixins/totp.py`:
+```js
+const seed = await client.totpGenerateSeed()
+const backupCodes = await client.totpEnable('123456')
+await client.totpDisable()
 
-- `totpGenerateSeed()` membuat seed 2FA lewat `accounts/generate_two_factor_totp_key/`.
-- `totpEnable(verificationCode)` mengaktifkan 2FA lewat `accounts/enable_totp_two_factor/` dan mengembalikan backup codes.
-- `totpDisable()` menonaktifkan 2FA lewat `accounts/disable_totp_two_factor/`.
-- `totpGenerateCode(seed)` menghasilkan kode 6 digit dari seed base32 (RFC 6238, SHA-1, interval 30 detik).
+const code = client.totpGenerateCode(seed)
+```
 
-Kelas `TOTP` diekspor dari `src/mixins/totp.js` untuk pemakaian langsung (mis. `new TOTP(seed).code()`). Perhitungan kode diuji dengan vektor RFC 4226/6238; ketiga endpoint hanya diuji memakai server palsu dan belum pernah dicoba ke Instagram sungguhan.
+Bisa dipanggil lewat `sock.client` atau instance `Client` langsung.
 
-## Belum diport
+## Batasan
 
-- Login Bloks CAA (`login()` memakai alur legacy `accounts/login/`), challenge resolver otomatis, realtime MQTT.
-- Upload post, reel, album, story, clip/IGTV, foto, dan video; download media lewat `Client`.
-- Public web/GraphQL API, signup, insights, notes, location, collection, highlight, track, share, fbsearch, notification, quicksnap, crossposting, captcha, attestation, multiple accounts.
-- Transport `curl`/`utls` (sidik jari TLS berbeda dari klien Python).
+- Pesan baru dideteksi lewat polling (default 10 detik), bukan realtime. `transport: 'mqtt'` melempar `NotSupportedError`.
+- Belum tersedia: login Bloks CAA, challenge resolver otomatis, upload post/reel/story, download media, public/GraphQL, signup, insights, location, dan modul lain di luar yang disebut di atas.
+- Semua pengujian memakai server palsu; belum pernah diuji ke Instagram sungguhan.
