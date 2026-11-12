@@ -1,4 +1,4 @@
-# instaleys
+# @rexxhayanasi/instaleys
 
 Klien Instagram Private API untuk Node.js 20+, dengan API bergaya Baileys.
 
