@@ -13,6 +13,7 @@ import { directExtraMixin } from './mixins/direct_extra.js'
 import { storyMixin } from './mixins/story.js'
 import { hashtagMixin } from './mixins/hashtag.js'
 import { exploreMixin } from './mixins/explore.js'
+import { totpMixin } from './mixins/totp.js'
 
 const silent = () => {}
 
@@ -126,7 +127,8 @@ Object.defineProperties(
       directExtraMixin,
       storyMixin,
       hashtagMixin,
-      exploreMixin
+      exploreMixin,
+      totpMixin
     ].map((mixin) => Object.getOwnPropertyDescriptors(mixin))
   )
 )

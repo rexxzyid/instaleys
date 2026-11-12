@@ -151,9 +151,20 @@ Helper: `getContentType`, `normalizeMessageContent`, `getMessageText`, `download
 
 Seluruh `Client` (semua method camelCase hasil port klien asli) juga tersedia di `sock.client`.
 
+## 2FA TOTP
+
+Port dari `instagrapi/mixins/totp.py`:
+
+- `totpGenerateSeed()` membuat seed 2FA lewat `accounts/generate_two_factor_totp_key/`.
+- `totpEnable(verificationCode)` mengaktifkan 2FA lewat `accounts/enable_totp_two_factor/` dan mengembalikan backup codes.
+- `totpDisable()` menonaktifkan 2FA lewat `accounts/disable_totp_two_factor/`.
+- `totpGenerateCode(seed)` menghasilkan kode 6 digit dari seed base32 (RFC 6238, SHA-1, interval 30 detik).
+
+Kelas `TOTP` diekspor dari `src/mixins/totp.js` untuk pemakaian langsung (mis. `new TOTP(seed).code()`). Perhitungan kode diuji dengan vektor RFC 4226/6238; ketiga endpoint hanya diuji memakai server palsu dan belum pernah dicoba ke Instagram sungguhan.
+
 ## Belum diport
 
 - Login Bloks CAA (`login()` memakai alur legacy `accounts/login/`), challenge resolver otomatis, realtime MQTT.
-- Upload post, reel, album, story; download media lewat `Client`.
-- Public web/GraphQL API, signup, insights, notes, location, collection, highlight.
+- Upload post, reel, album, story, clip/IGTV, foto, dan video; download media lewat `Client`.
+- Public web/GraphQL API, signup, insights, notes, location, collection, highlight, track, share, fbsearch, notification, quicksnap, crossposting, captcha, attestation, multiple accounts.
 - Transport `curl`/`utls` (sidik jari TLS berbeda dari klien Python).
