@@ -101,6 +101,20 @@ await sock.instagram.hashtagMedias('travel')
 
 Method lain: `following`, `clips`, `stories`, `follow`, `unfollow`, `block`, `unblock`, `closeFriendAdd/Remove`, `followRequests`, `unlike`, `comments`, `commentReplies`, `likeComment`, `deleteComments`, `mediaInfo`, `storyViewers`, `hashtagInfo`, `hashtagFollow`, `explore`, `timeline`, `reelsTray`, `editAccount`, `setPrivate`, `setPublic`.
 
+## Notes
+
+```js
+const notes = await sock.instagram.notes()
+sock.client.getNoteTextByUser(notes, 'username')
+
+await sock.instagram.createNote('halo', { audience: 0 })
+await sock.instagram.createMusicNote(track, 'lagu')
+await sock.instagram.deleteNote(noteId)
+await sock.instagram.updateNotesLastSeen()
+```
+
+`sock.instagram.notes()` memakai private GraphQL (`graphql/query`). `track` berasal dari `client.notesMusicBrowser()` atau objek lain dengan `audio_cluster_id`.
+
 ## Koleksi, reels, lokasi, highlight
 
 ```js

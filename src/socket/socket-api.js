@@ -411,6 +411,11 @@ export const buildSocketApi = (rt) => {
     highlightRemoveStories: async (highlightPk, removedMediaIds) =>
       client.highlightRemoveStories(highlightPk, removedMediaIds),
     highlightDelete: async (highlightPk) => client.highlightDelete(highlightPk),
+    notes: async () => client.getNotes(),
+    createNote: async (text, options = {}) => client.createNote(text, options),
+    createMusicNote: async (track, text = '', options = {}) => client.createMusicNote(track, text, options),
+    deleteNote: async (noteId) => client.deleteNote(noteId),
+    updateNotesLastSeen: async () => client.lastSeenUpdateNote(),
     collections: async () => client.collections(),
     collectionPkByName: async (name) => client.collectionPkByName(name),
     collectionMedias: async (collectionPk, amount = 21, lastMediaPk = 0) =>
