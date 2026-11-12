@@ -24,6 +24,7 @@ import { noteMixin } from './mixins/note.js'
 import { insightsMixin } from './mixins/insights.js'
 import { fbsearchMixin } from './mixins/fbsearch.js'
 import { multipleAccountsMixin, notificationMixin } from './mixins/notification.js'
+import { trackMixin } from './mixins/track.js'
 
 const silent = () => {}
 
@@ -149,7 +150,8 @@ Object.defineProperties(
       insightsMixin,
       fbsearchMixin,
       notificationMixin,
-      multipleAccountsMixin
+      multipleAccountsMixin,
+      trackMixin
     ].map((mixin) => Object.getOwnPropertyDescriptors(mixin))
   )
 )

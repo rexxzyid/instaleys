@@ -143,6 +143,21 @@ await sock.instagram.accountFamily()
 
 Nilai `notificationMuteAll`: `cancel`, `15_minutes`, `1_hour`, `2_hour`, `4_hour`, `8_hour`. Nilai setting lain: `off`, `following_only`, `everyone`.
 
+## Musik dan track
+
+```js
+await sock.instagram.musicSearchV2('judul lagu')
+await sock.instagram.musicTrending()
+await sock.instagram.trackInfo(musicCanonicalId)
+await sock.instagram.trackById(audioClusterId)
+
+await sock.client.musicKeywordSearch('lagu', { numKeywords: 3 })
+await sock.client.musicBookmark(originalAudioId)
+await sock.client.musicVerifyOriginalAudioTitle('Judul audio')
+```
+
+Method lain di `sock.client`: `musicInFeedAudioBrowser`, `musicTopTrends`, `musicBookmarked`, `musicClipsAudioBrowser`, `trackStreamInfoById`. Track yang tidak ditemukan melempar `TrackNotFound`.
+
 ## Insights (akun bisnis/kreator)
 
 ```js
@@ -217,7 +232,7 @@ Bisa dipanggil lewat `sock.client` atau instance `Client` langsung.
 ## Batasan
 
 - Pesan baru dideteksi lewat polling (default 10 detik), bukan realtime. `transport: 'mqtt'` melempar `NotSupportedError`.
-- Belum tersedia: login Bloks CAA, challenge resolver otomatis, upload post/reel/story, download media, public web API, signup, track, dan modul lain di luar yang disebut di atas.
+- Belum tersedia: login Bloks CAA, challenge resolver otomatis, upload post/reel/story, download media, public web API, signup, `trackDownloadByUrl`, dan modul lain di luar yang disebut di atas.
 - `locationSearchName`, `locationSearchPk`, `locationComplete`, dan `locationBuild` tidak diport karena bergantung pada public web API.
 - `highlightChangeCover` tidak diport karena butuh upload foto (`photo_rupload`).
 - Semua pengujian memakai server palsu; belum pernah diuji ke Instagram sungguhan.

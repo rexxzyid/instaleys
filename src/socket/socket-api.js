@@ -431,6 +431,10 @@ export const buildSocketApi = (rt) => {
     notificationDisable: async () => client.notificationDisable(),
     featuredAccounts: async (who) => client.featuredAccountsV1(await resolvePk(who)),
     accountFamily: async () => client.getAccountFamilyV1(),
+    musicSearchV2: async (query, opts = {}) => client.musicSearchV2(query, opts),
+    musicTrending: async (product = 'feed_post') => client.musicTrending(product),
+    trackInfo: async (musicCanonicalId) => client.trackInfoByCanonicalId(musicCanonicalId),
+    trackById: async (trackId, maxId = '') => client.trackInfoById(trackId, maxId),
     collections: async () => client.collections(),
     collectionPkByName: async (name) => client.collectionPkByName(name),
     collectionMedias: async (collectionPk, amount = 21, lastMediaPk = 0) =>
