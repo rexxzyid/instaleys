@@ -4,7 +4,7 @@ Panduan wajib untuk setiap agent AI atau kontributor yang mengubah proyek ini. B
 
 ## 1. Proyek ini apa
 
-Port Node.js (ESM, Node >= 18.17) dari library Python `instagrapi` (Instagram Private API, meniru aplikasi Android), dengan dua lapisan:
+Port Node.js (ESM, Node >= 20) dari library Python `instagrapi` (Instagram Private API, meniru aplikasi Android), dengan dua lapisan:
 
 1. `Client` (`src/client.js`, `src/mixins/*`): port langsung instagrapi.
 2. `makeIGSocket` (`src/socket/*`): API bergaya Baileys di atas `Client`. Mendeteksi pesan baru lewat polling inbox, bukan realtime.

@@ -1,6 +1,6 @@
 # instaleys
 
-Klien Instagram Private API untuk Node.js 18.17+, dengan API bergaya Baileys.
+Klien Instagram Private API untuk Node.js 20+, dengan API bergaya Baileys.
 
 ```bash
 npm install instaleys
