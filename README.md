@@ -171,6 +171,18 @@ await sock.instagram.fundraiserInfo('username')
 
 Helper GraphQL di `sock.client`: `privateGraphqlWwwRequest`, `privateGraphqlMemoriesPog`, `privateGraphqlRealtimeRegionHint`, `privateGraphqlTopAudioTrendsEligibleCategories`, `privateGraphqlUpdateInboxTrayLastSeen`.
 
+## Crossposting Facebook dan Threads
+
+```js
+await sock.instagram.facebookDestination()
+await sock.instagram.threadsDestination()
+
+await sock.client.mediaShareToFbExtraData({ destinationId: '123', destinationType: 'USER' })
+await sock.client.mediaShareToThreadsExtraData()
+```
+
+Method lain di `sock.client`: `mediaShareToFbUnifiedConfig`, `mediaShareToFbConnectedServicesConfig`, `mediaShareToFbUnifiedDestination`, `mediaShareToThreadsConfig`. Hasil `*ExtraData` disiapkan untuk upload media, yang belum diport.
+
 ## Insights (akun bisnis/kreator)
 
 ```js

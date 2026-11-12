@@ -438,6 +438,8 @@ export const buildSocketApi = (rt) => {
     fundraiserInfo: async (who) => client.standaloneFundraiserInfoV1(await resolvePk(who)),
     quicksnapHistory: async (amount = 20, endCursor = null) => client.quicksnapHistory(amount, endCursor),
     quicksnapDelete: async (mediaId) => client.quicksnapDelete(mediaId),
+    facebookDestination: async (opts = {}) => client.mediaShareToFbDestination(opts),
+    threadsDestination: async (opts = {}) => client.mediaShareToThreadsDestination(opts),
     collections: async () => client.collections(),
     collectionPkByName: async (name) => client.collectionPkByName(name),
     collectionMedias: async (collectionPk, amount = 21, lastMediaPk = 0) =>

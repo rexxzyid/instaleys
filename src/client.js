@@ -27,6 +27,7 @@ import { multipleAccountsMixin, notificationMixin } from './mixins/notification.
 import { trackMixin } from './mixins/track.js'
 import { fundraiserMixin } from './mixins/fundraiser.js'
 import { quicksnapMixin } from './mixins/quicksnap.js'
+import { crosspostingMixin } from './mixins/crossposting.js'
 
 const silent = () => {}
 
@@ -155,7 +156,8 @@ Object.defineProperties(
       multipleAccountsMixin,
       trackMixin,
       fundraiserMixin,
-      quicksnapMixin
+      quicksnapMixin,
+      crosspostingMixin
     ].map((mixin) => Object.getOwnPropertyDescriptors(mixin))
   )
 )
