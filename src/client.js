@@ -23,6 +23,7 @@ import { graphqlMixin } from './mixins/graphql.js'
 import { noteMixin } from './mixins/note.js'
 import { insightsMixin } from './mixins/insights.js'
 import { fbsearchMixin } from './mixins/fbsearch.js'
+import { multipleAccountsMixin, notificationMixin } from './mixins/notification.js'
 
 const silent = () => {}
 
@@ -146,7 +147,9 @@ Object.defineProperties(
       graphqlMixin,
       noteMixin,
       insightsMixin,
-      fbsearchMixin
+      fbsearchMixin,
+      notificationMixin,
+      multipleAccountsMixin
     ].map((mixin) => Object.getOwnPropertyDescriptors(mixin))
   )
 )

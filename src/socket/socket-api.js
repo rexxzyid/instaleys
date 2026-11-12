@@ -426,6 +426,11 @@ export const buildSocketApi = (rt) => {
     searchTop: async (query) => client.fbsearchTopsearchFlat(query),
     searchRecent: async () => client.fbsearchRecent(),
     suggestedProfiles: async (who) => client.fbsearchSuggestedProfiles(await resolvePk(who)),
+    notificationSettings: async (contentType, settingValue) => client.notificationSettings(contentType, settingValue),
+    notificationMuteAll: async (settingValue = '8_hour') => client.notificationMuteAll(settingValue),
+    notificationDisable: async () => client.notificationDisable(),
+    featuredAccounts: async (who) => client.featuredAccountsV1(await resolvePk(who)),
+    accountFamily: async () => client.getAccountFamilyV1(),
     collections: async () => client.collections(),
     collectionPkByName: async (name) => client.collectionPkByName(name),
     collectionMedias: async (collectionPk, amount = 21, lastMediaPk = 0) =>

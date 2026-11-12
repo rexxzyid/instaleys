@@ -129,6 +129,20 @@ await sock.instagram.suggestedProfiles('username')
 
 Method lain di `sock.client`: `fbsearchAccountsV2`, `fbsearchReelsV2`, `fbsearchTopsearchV2`, `fbsearchItem`, `fbsearchKeywordTypeahead`, `fbsearchTypeaheadStream`, `fbsearchTypehead`, `webSearchTopsearch`, `webSearchTopsearchHashtags`.
 
+## Notifikasi dan multi akun
+
+```js
+await sock.instagram.notificationMuteAll('1_hour')
+await sock.instagram.notificationSettings('likes', 'following_only')
+await sock.instagram.notificationDisable()
+await sock.client.notificationComments('everyone')
+
+await sock.instagram.featuredAccounts('username')
+await sock.instagram.accountFamily()
+```
+
+Nilai `notificationMuteAll`: `cancel`, `15_minutes`, `1_hour`, `2_hour`, `4_hour`, `8_hour`. Nilai setting lain: `off`, `following_only`, `everyone`.
+
 ## Insights (akun bisnis/kreator)
 
 ```js
