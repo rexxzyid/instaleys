@@ -290,4 +290,4 @@ Bisa dipanggil lewat `sock.client` atau instance `Client` langsung.
 - Belum tersedia: login Bloks CAA, upload post/reel/story, download media, public web API, signup, `trackDownloadByUrl`, dan modul lain di luar yang disebut di atas.
 - `locationSearchName`, `locationSearchPk`, `locationComplete`, dan `locationBuild` tidak diport karena bergantung pada public web API.
 - `highlightChangeCover` tidak diport karena butuh upload foto (`photo_rupload`).
-- Semua pengujian memakai server palsu; belum pernah diuji ke Instagram sungguhan.
+
