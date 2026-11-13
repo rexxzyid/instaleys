@@ -28,6 +28,8 @@ import { trackMixin } from './mixins/track.js'
 import { fundraiserMixin } from './mixins/fundraiser.js'
 import { quicksnapMixin } from './mixins/quicksnap.js'
 import { crosspostingMixin } from './mixins/crossposting.js'
+import { captchaMixin } from './mixins/captcha.js'
+import { attestationMixin } from './mixins/attestation.js'
 
 const silent = () => {}
 
@@ -84,6 +86,15 @@ export class Client {
     this.locale = 'en_US'
     this.igURur = ''
     this.igWwwClaim = ''
+    this.usdid = ''
+    this.usdidKid = ''
+    this.usdidPrivateKey = ''
+    this.usdidRegistered = false
+    this.attestationChallengeNonce = ''
+    this.attestationKeyNonce = ''
+    this.usdidHeaderCache = ''
+    this.usdidHeaderExpiresAt = 0
+    this.captchaHandlerInstance = null
     this.bloksVersioningId = APP_SETTINGS[DEFAULT_APP_VERSION].bloks_versioning_id
     this.userAgent = null
     this.domain = API_DOMAIN
@@ -157,7 +168,9 @@ Object.defineProperties(
       trackMixin,
       fundraiserMixin,
       quicksnapMixin,
-      crosspostingMixin
+      crosspostingMixin,
+      captchaMixin,
+      attestationMixin
     ].map((mixin) => Object.getOwnPropertyDescriptors(mixin))
   )
 )

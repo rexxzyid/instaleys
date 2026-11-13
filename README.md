@@ -183,6 +183,20 @@ await sock.client.mediaShareToThreadsExtraData()
 
 Method lain di `sock.client`: `mediaShareToFbUnifiedConfig`, `mediaShareToFbConnectedServicesConfig`, `mediaShareToFbUnifiedDestination`, `mediaShareToThreadsConfig`. Hasil `*ExtraData` disiapkan untuk upload media, yang belum diport.
 
+## Captcha dan atestasi perangkat
+
+```js
+sock.client.setCaptchaHandler(async ({ site_key, page_url, challenge_type, raw_challenge_json }) => 'token')
+await sock.client.captchaResolve({ site_key: '...' })
+
+sock.client.usdidGenerate()
+await sock.client.usdidRegister()
+await sock.client.attestationCreateAndroidKeystore()
+sock.client.attestationParams()
+```
+
+Kunci USDID (P-256) tersimpan di settings `usdid`. Setelah kunci dibuat, setiap request mengirim header `X-Meta-Usdid`. Kunci dihapus otomatis bila `phone_id` berubah.
+
 ## Insights (akun bisnis/kreator)
 
 ```js

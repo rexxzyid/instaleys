@@ -150,6 +150,7 @@ export const privateMixin = {
     }
     if (this.igURur) headers['IG-U-RUR'] = this.igURur
     if (this.igWwwClaim) headers['X-IG-WWW-Claim'] = this.igWwwClaim
+    if (this.usdidPrivateKey) headers['X-Meta-Usdid'] = this.usdidHeader()
     return headers
   },
 

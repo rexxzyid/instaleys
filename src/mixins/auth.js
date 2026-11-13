@@ -18,6 +18,11 @@ import {
 } from '../errors.js'
 import { dumps, generateJazoest, genToken, generateUuid, randomBetween } from '../utils.js'
 
+const usdidSettingsEntry = (client) => {
+  const usdidSettings = client.getUsdidSettings()
+  return Object.keys(usdidSettings).length ? { usdid: usdidSettings } : {}
+}
+
 export const authMixin = {
   get cookieDict() {
     return this.private.cookies.toObject()
@@ -110,6 +115,7 @@ export const authMixin = {
     this.mid = this.settings.mid ?? this.cookieDict.mid ?? ''
     this.setIgURur(this.settings.ig_u_rur ?? '')
     this.setIgWwwClaim(this.settings.ig_www_claim ?? '')
+    this.setUsdidSettings(this.settings.usdid)
     return true
   },
 
@@ -145,9 +151,11 @@ export const authMixin = {
       timezone_name: this.timezoneName,
       push_disabled: this.pushDisabled,
       request_timeout: this.requestTimeout,
-      tls_verify: this.tlsVerify
+      tls_verify: this.tlsVerify,
+      ...usdidSettingsEntry(this)
     }
   },
+
 
   setSettings(settings) {
     this.settings = structuredClone(settings)
@@ -240,6 +248,7 @@ export const authMixin = {
   },
 
   setUuids(uuids = {}) {
+    const previousPhoneId = this.phoneId
     this.phoneId = uuids.phone_id ?? this.generateUuid()
     this.uuid = uuids.uuid ?? this.generateUuid()
     this.clientSessionId = uuids.client_session_id ?? this.generateUuid()
@@ -248,6 +257,7 @@ export const authMixin = {
     this.requestId = uuids.request_id ?? this.generateUuid()
     this.traySessionId = uuids.tray_session_id ?? this.generateUuid()
     this.settings.uuids = uuids
+    if (previousPhoneId && previousPhoneId !== this.phoneId) this.setUsdidSettings({})
     return true
   },
 
