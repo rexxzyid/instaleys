@@ -1,7 +1,7 @@
 import { API_DOMAIN, DEFAULT_APP_VERSION, APP_SETTINGS } from './config.js'
 import { HttpSession } from './http.js'
 import { generateUuid } from './utils.js'
-import { manualInputCode, privateMixin } from './mixins/private.js'
+import { manualChangePassword, manualInputCode, privateMixin } from './mixins/private.js'
 import { authMixin } from './mixins/auth.js'
 import { passwordMixin } from './mixins/password.js'
 import { accountMixin } from './mixins/account.js'
@@ -30,6 +30,8 @@ import { quicksnapMixin } from './mixins/quicksnap.js'
 import { crosspostingMixin } from './mixins/crossposting.js'
 import { captchaMixin } from './mixins/captcha.js'
 import { attestationMixin } from './mixins/attestation.js'
+import { bloksMixin } from './mixins/bloks.js'
+import { CHALLENGE_WAIT_SECONDS, challengeMixin } from './mixins/challenge.js'
 
 const silent = () => {}
 
@@ -55,7 +57,10 @@ export class Client {
     pushDisabled = true,
     withChallengeFlow = true,
     challengeCodeHandler = manualInputCode,
-    handleException = null
+    changePasswordHandler = manualChangePassword,
+    handleException = null,
+    email = null,
+    phoneNumber = null
   } = {}) {
     this.usersCache = new Map()
     this.usernamesCache = new Map()
@@ -107,6 +112,10 @@ export class Client {
     this.pushDisabled = pushDisabled
     this.withChallengeFlow = withChallengeFlow
     this.challengeCodeHandler = challengeCodeHandler
+    this.changePasswordHandler = changePasswordHandler
+    this.challengeWaitSeconds = CHALLENGE_WAIT_SECONDS
+    this.email = email
+    this.phoneNumber = phoneNumber
     this.handleException = handleException
     this.challengeResolve = null
     this.overrideAppVersion = overrideAppVersion
@@ -170,7 +179,9 @@ Object.defineProperties(
       quicksnapMixin,
       crosspostingMixin,
       captchaMixin,
-      attestationMixin
+      attestationMixin,
+      bloksMixin,
+      challengeMixin
     ].map((mixin) => Object.getOwnPropertyDescriptors(mixin))
   )
 )

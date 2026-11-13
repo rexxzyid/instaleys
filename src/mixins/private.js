@@ -83,6 +83,12 @@ export const manualInputCode = async () => {
   )
 }
 
+export const manualChangePassword = async () => {
+  throw new ChallengeRequired(
+    'Password input is unavailable. Provide changePasswordHandler or set withChallengeFlow to false.'
+  )
+}
+
 export const privateMixin = {
   smallDelay() {
     return sleep(randomUniform(0.75, 3.75) * 1000)
@@ -442,8 +448,9 @@ export const privateMixin = {
       }
       if (this.handleException) {
         await this.handleException(this, error)
-      } else if (error instanceof ChallengeRequired && this.withChallengeFlow && this.challengeResolve) {
-        await this.challengeResolve(this.lastJson)
+      } else if (error instanceof ChallengeRequired) {
+        if (!this.withChallengeFlow) throw error
+        await (this.challengeResolve ?? this.resolveChallenge).call(this, this.lastJson)
       } else {
         throw error
       }

@@ -197,6 +197,22 @@ sock.client.attestationParams()
 
 Kunci USDID (P-256) tersimpan di settings `usdid`. Setelah kunci dibuat, setiap request mengirim header `X-Meta-Usdid`. Kunci dihapus otomatis bila `phone_id` berubah.
 
+## Challenge
+
+```js
+const client = new Client({
+  challengeCodeHandler: async (username, choice) => '123456',
+  changePasswordHandler: async (username) => 'PasswordBaru123!',
+  email: 'saya@contoh.com',
+  phoneNumber: '+62811000000',
+  withChallengeFlow: true
+})
+
+await client.challengeBloksRedirectDismiss()
+```
+
+Saat request menerima `ChallengeRequired`, resolver berjalan otomatis lalu request diulang. `choice` bernilai `0` (SMS) atau `1` (email). Set `withChallengeFlow: false` agar `ChallengeRequired` langsung dilempar. Checkpoint `auth_platform`, `native_flow`, `ufac_www_bloks`, dan `selfie_captcha` tetap harus diselesaikan manual di aplikasi resmi.
+
 ## Insights (akun bisnis/kreator)
 
 ```js
@@ -271,7 +287,7 @@ Bisa dipanggil lewat `sock.client` atau instance `Client` langsung.
 ## Batasan
 
 - Pesan baru dideteksi lewat polling (default 10 detik), bukan realtime. `transport: 'mqtt'` melempar `NotSupportedError`.
-- Belum tersedia: login Bloks CAA, challenge resolver otomatis, upload post/reel/story, download media, public web API, signup, `trackDownloadByUrl`, dan modul lain di luar yang disebut di atas.
+- Belum tersedia: login Bloks CAA, upload post/reel/story, download media, public web API, signup, `trackDownloadByUrl`, dan modul lain di luar yang disebut di atas.
 - `locationSearchName`, `locationSearchPk`, `locationComplete`, dan `locationBuild` tidak diport karena bergantung pada public web API.
 - `highlightChangeCover` tidak diport karena butuh upload foto (`photo_rupload`).
 - Semua pengujian memakai server palsu; belum pernah diuji ke Instagram sungguhan.
